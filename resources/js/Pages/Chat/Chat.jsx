@@ -6,11 +6,10 @@ import yourLogo from '../../../../public/images/Open.png';
 
 export default function Chat({ auth }) {
     const [users, setUsers] = useState([]);
-    const [activeChatUser, setActiveChatUser] = useState(null); // State for the active chat user
-    const [messages, setMessages] = useState([]); // State for storing messages
-    const [newMessage, setNewMessage] = useState(''); // State for the input message
+    const [activeChatUser, setActiveChatUser] = useState(null); 
+    const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState(''); 
 
-    // Initialize CSRF token and fetch users
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -26,18 +25,16 @@ export default function Chat({ auth }) {
         fetchUsers();
     }, []);
 
-    // Function to handle opening the chat box and fetching messages for that user
     const openChatBox = async (user) => {
         setActiveChatUser(user);
         try {
             const response = await axios.post('/messages', { user_id: auth.user.id, recipient_id: user.id });
-            setMessages(response.data.messages); // Set the fetched messages
+            setMessages(response.data.messages);
         } catch (error) {
             console.error('Error fetching messages:', error);
         }
     };
 
-    // Function to handle sending a new message
     const handleSendMessage = async () => {
         if (!newMessage.trim()) return;
 
@@ -89,19 +86,19 @@ export default function Chat({ auth }) {
                 </div>
             </div>
 
-            {/* Chat Box */}
+            {/* Responsive Chat Box */}
             {activeChatUser && (
-                <div className="fixed bottom-0 right-0 m-4 bg-white shadow-lg rounded-lg border w-80">
+                <div className="fixed inset-0 sm:bottom-0 sm:right-0 sm:inset-auto m-0 sm:m-6 bg-white shadow-lg rounded-none sm:rounded-lg border w-full sm:w-[400px] h-full sm:h-[75vh] flex flex-col">
                     <div className="p-4 border-b flex justify-between items-center">
                         <h4 className="font-semibold text-lg">{activeChatUser.name}</h4>
                         <button 
                             className="text-gray-600 hover:text-gray-800"
-                            onClick={() => setActiveChatUser(null)} // Close chat box
+                            onClick={() => setActiveChatUser(null)}
                         >
                             &times;
                         </button>
                     </div>
-                    <div className="p-4 h-48 overflow-y-auto">
+                    <div className="p-4 flex-1 overflow-y-auto">
                         {messages.length ? (
                             messages.map((msg, index) => (
                                 <div key={index} className="text-gray-700 mb-2">
