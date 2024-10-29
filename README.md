@@ -64,3 +64,23 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## About Installation
+
+Step 1:-  clone the git reporsitory , repo link is as follows https://github.com/BM-1998/Real-time-chat.git
+
+Step 2:- After cloning redirect to root repository, Run Command -> "composer install"
+
+Step 3:-  After that run command as "npm install" to install all node_modules for react.js
+
+step 4:- create Databse in your local server and add this in .env file.
+
+step 5:- Run command "php artisan migrate" to create all the structures in database.
+
+setp 6:- Run Seeder command as "php artisan db:seed --class=UserSeeder"
+
+Step 7:- Run Command as "php artisan serve"
+
+step 8:- Open a new terminal and run command as "npm run dev"
+
+All set you are good to go.!!!
