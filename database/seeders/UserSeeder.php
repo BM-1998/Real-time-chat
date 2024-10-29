@@ -20,11 +20,13 @@ class UserSeeder extends Seeder
                 'email' => 'Doraemon@example.com',
                 'name' => 'User One',
                 'password' => Hash::make('12345678'), // Use Hash::make for hashing passwords
+                'profile_image' => NULL
             ],
             [
                 'email' => 'nobita@example.com',
                 'name' => 'User Two',
                 'password' => Hash::make('12345678'),
+                'profile_image' => NULL
             ],
         ]);
     }
