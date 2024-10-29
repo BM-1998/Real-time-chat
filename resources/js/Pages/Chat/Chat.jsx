@@ -95,28 +95,25 @@ export default function Chat({ auth }) {
     return (
         <>
             <Head title="Chat" />
-
+    
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6">
-                            <h3 className="font-semibold text-lg border-b-2 pb-2 mb-4">My Chats</h3>
-                            <ul className="mt-4 space-y-2">
+                    <div className="bg-white overflow-hidden shadow-md rounded-lg border border-gray-300">
+                        <div className="p-4">
+                            <h3 className="font-semibold text-xl text-blue-600 border-b border-gray-300 pb-3 mb-4">My Chats</h3>
+                            <ul className="space-y-2">
                                 {users.map(user => (
-                                    <li key={user.id} className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-100 transition">
+                                    <li key={user.id} className="flex items-center p-3 border border-gray-200 rounded-md hover:bg-gray-50 transition cursor-pointer" onClick={() => openChatBox(user)}>
                                         <img 
                                             src={user.profile_image || yourLogo}
                                             alt={`${user.name}'s profile`}
-                                            className="w-12 h-12 rounded-full mr-4"
+                                            className="w-10 h-10 rounded-full mr-3"
                                         />
                                         <div className="flex-grow">
                                             <span className="text-gray-900 font-medium">{user.name}</span>
-                                            <div className="text-gray-600 text-sm">Last seen: 2 minutes ago</div>
+                                            <div className="text-gray-500 text-sm">Last seen: 2 mins ago</div>
                                         </div>
-                                        <button 
-                                            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
-                                            onClick={() => openChatBox(user)}
-                                        >
+                                        <button className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600 transition">
                                             Chat
                                         </button>
                                     </li>
@@ -126,42 +123,40 @@ export default function Chat({ auth }) {
                     </div>
                 </div>
             </div>
-
-            {/* Responsive Chat Box */}
+    
+            {/* Chat Box */}
             {activeChatUser && (
-                <div className="fixed inset-0 sm:bottom-0 sm:right-0 sm:inset-auto m-0 sm:m-6 bg-white shadow-lg rounded-none sm:rounded-lg border w-full sm:w-[400px] h-full sm:h-[75vh] flex flex-col">
-                    <div className="p-4 border-b flex justify-between items-center">
-                        <h4 className="font-semibold text-lg">{activeChatUser.name}</h4>
-                        <button 
-                            className="text-gray-600 hover:text-gray-800"
-                            onClick={() => setActiveChatUser(null)}
-                        >
+                <div className="fixed inset-0 sm:bottom-0 sm:right-0 sm:inset-auto sm:m-6 bg-white shadow-lg rounded-none sm:rounded-lg border w-full sm:w-[350px] h-full sm:h-[75vh] flex flex-col">
+                    <div className="p-3 border-b flex justify-between items-center bg-blue-50">
+                        <h4 className="font-semibold text-lg text-gray-800">{activeChatUser.name}</h4>
+                        <button className="text-gray-500 hover:text-gray-700 text-lg" onClick={() => setActiveChatUser(null)}>
                             &times;
                         </button>
                     </div>
-                    <div className="p-4 flex-1 overflow-y-auto">
+                    <div className="p-4 flex-1 overflow-y-auto bg-gray-50">
                         {messages.length ? (
                             messages.map((msg, index) => (
-                                <div key={index} className="text-gray-700 mb-2">
-                                    <strong>{msg.sender_name === auth.user.name ? 'You' : msg.sender_name}: </strong> 
-                                    {msg.content}
+                                <div key={index} className={`mb-2 ${msg.sender_id === auth.user.id ? 'text-right' : 'text-left'}`}>
+                                    <span className={`inline-block p-2 rounded-md ${msg.sender_id === auth.user.id ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}>
+                                        <strong>{msg.sender_name === auth.user.name ? 'You' : msg.sender_name}:</strong> {msg.content}
+                                    </span>
                                 </div>
                             ))
                         ) : (
-                            <div className="text-gray-600">No messages yet. Start chatting with {activeChatUser.name}...</div>
+                            <div className="text-gray-500">No messages yet. Start chatting with {activeChatUser.name}...</div>
                         )}
-                        <div ref={messagesEndRef} /> {/* This will help in scrolling to the bottom */}
+                        <div ref={messagesEndRef} />
                     </div>
-                    <div className="p-2 border-t flex items-center">
+                    <div className="p-3 border-t flex items-center bg-gray-100">
                         <input 
                             type="text"
-                            className="border w-full p-2 rounded mr-2"
+                            className="border rounded-md flex-grow p-2 mr-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Type your message..."
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                         />
                         <button 
-                            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+                            className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-600 transition"
                             onClick={handleSendMessage}
                         >
                             Send
@@ -171,4 +166,5 @@ export default function Chat({ auth }) {
             )}
         </>
     );
+    
 }

@@ -27,7 +27,7 @@ Route::get('/', function () {
 });
 
 Route::get('/send-message', function () {
-    event(new MessageSent('Hello from Pusher and React!',1));
+    event(new MessageSent('Hello from Pusher and React!',1,2,'baban','user'));
     return 'Message Sent!';
 });
 

@@ -9,6 +9,7 @@ use App\Models\Messages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Events\MessageSent;
+use App\Events\GroupMessageSent;
 
 class UserController extends Controller
 {
@@ -174,7 +175,7 @@ class UserController extends Controller
        
         $receiver = User::find($message->receiver_id);
 
-       
+        event(new GroupMessageSent($request->message,$request->user_id,$sender->name,$request->room_id));
         return response()->json([
         'id' => $message->id,
         'content' => $message->content,
@@ -203,7 +204,7 @@ class UserController extends Controller
             'description' => 'nullable|string',
             'user_ids' => 'required|array',
             'user_ids.*' => 'exists:users,id', // Ensure each user ID exists in the users table
-            'creator_id' => 'required|exists:users,id',
+            //'creator_id' => 'required|exists:users,id',
         ]);
 
         try {
