@@ -1,14 +1,40 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import axios, { initAxios } from '../../axiosConfig';
 import yourLogo from '../../../../public/images/Open.png';
+import echo from '../../echo';
 
 export default function Chat({ auth }) {
     const [users, setUsers] = useState([]);
-    const [activeChatUser, setActiveChatUser] = useState(null); 
+    const [activeChatUser, setActiveChatUser] = useState(null);
     const [messages, setMessages] = useState([]);
-    const [newMessage, setNewMessage] = useState(''); 
+    const [newMessage, setNewMessage] = useState('');
+    const messagesEndRef = useRef(null); // Ref for scrolling to the bottom
+
+    useEffect(() => {
+        const channel = echo.channel(`msg-channel.${auth.user.id}`);
+        channel.listen('.message.sent', (event) => {
+            const receivedMessage = {
+                sender_id: event.sender_id,
+                receiver_id: event.receiver_id,
+                sender_name: event.sender_name,
+                content: event.message,
+            };
+
+            if (activeChatUser && activeChatUser.id === receivedMessage.sender_id) {
+                setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+            } else {
+                setActiveChatUser({ id: receivedMessage.sender_id, name: receivedMessage.sender_name });
+                loadMessagesForUser(receivedMessage.sender_id);
+                setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+            }
+        });
+
+        return () => {
+            channel.stopListening('.message.sent');
+        };
+    }, [auth.user.id, activeChatUser]);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -27,8 +53,12 @@ export default function Chat({ auth }) {
 
     const openChatBox = async (user) => {
         setActiveChatUser(user);
+        await loadMessagesForUser(user.id);
+    };
+
+    const loadMessagesForUser = async (recipientId) => {
         try {
-            const response = await axios.post('/messages', { user_id: auth.user.id, recipient_id: user.id });
+            const response = await axios.post('/messages', { user_id: auth.user.id, recipient_id: recipientId });
             setMessages(response.data.messages);
         } catch (error) {
             console.error('Error fetching messages:', error);
@@ -44,12 +74,23 @@ export default function Chat({ auth }) {
                 recipient_id: activeChatUser.id,
                 message: newMessage,
             });
-            setMessages((prevMessages) => [...prevMessages, response.data]); 
-            setNewMessage(''); 
+            setMessages((prevMessages) => [...prevMessages, response.data]);
+            setNewMessage('');
         } catch (error) {
             console.error('Error sending message:', error);
         }
     };
+
+    // Function to scroll to the bottom when new messages arrive
+    const scrollToBottom = () => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
+    useEffect(() => {
+        scrollToBottom(); // Scroll to bottom whenever messages change
+    }, [messages]);
 
     return (
         <>
@@ -109,6 +150,7 @@ export default function Chat({ auth }) {
                         ) : (
                             <div className="text-gray-600">No messages yet. Start chatting with {activeChatUser.name}...</div>
                         )}
+                        <div ref={messagesEndRef} /> {/* This will help in scrolling to the bottom */}
                     </div>
                     <div className="p-2 border-t flex items-center">
                         <input 

@@ -8,6 +8,7 @@ use App\Models\Rooms;
 use App\Models\Messages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Events\MessageSent;
 
 class UserController extends Controller
 {
@@ -80,7 +81,7 @@ class UserController extends Controller
        
         $receiver = User::find($message->receiver_id);
 
-       
+        event(new MessageSent($request->message,$request->user_id,$request->recipient_id,$sender->name,$receiver->name));
         return response()->json([
         'id' => $message->id,
         'content' => $message->content,
