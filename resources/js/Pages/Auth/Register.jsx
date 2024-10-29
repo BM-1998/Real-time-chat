@@ -23,6 +23,24 @@ export default function Register() {
     const submit = (e) => {
         e.preventDefault();
 
+        // Validation checks for mandatory fields
+        if (!data.name) {
+            alert('Name is required');
+            return;
+        }
+        if (!data.email) {
+            alert('Email is required');
+            return;
+        }
+        if (!data.password) {
+            alert('Password is required');
+            return;
+        }
+        if (!data.password_confirmation) {
+            alert('Confirm Password is required');
+            return;
+        }
+
         post(route('register'));
     };
 
@@ -45,7 +63,7 @@ export default function Register() {
             <form onSubmit={submit}>
                 <div className="text-center mt-8">
                     <h2 className="text-4xl font-bold text-indigo-600">Welcome to ChatVerse</h2>
-                    <p className="text-gray-500 mt-2">Register Your Self For Seamless Connection</p>
+                    <p className="text-gray-500 mt-2">Register Yourself For Seamless Connection</p>
                 </div>
                 <div>
                     <InputLabel htmlFor="name" value="Name" />

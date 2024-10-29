@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Checkbox from '@/Components/Checkbox';
 import GuestLayout from '@/Layouts/GuestLayout';
 import InputError from '@/Components/InputError';
@@ -14,6 +14,12 @@ export default function Login({ status, canResetPassword }) {
         remember: false,
     });
 
+    const [loginError, setLoginError] = useState('');
+    const [fieldErrors, setFieldErrors] = useState({
+        email: '',
+        password: '',
+    });
+
     useEffect(() => {
         return () => {
             reset('password');
@@ -23,7 +29,33 @@ export default function Login({ status, canResetPassword }) {
     const submit = (e) => {
         e.preventDefault();
 
-        post(route('login'));
+        // Reset field errors
+        setFieldErrors({
+            email: '',
+            password: '',
+        });
+        setLoginError('');
+
+        // Check for empty fields
+        if (!data.email) {
+            setFieldErrors((prev) => ({ ...prev, email: 'Email is required.' }));
+            return;
+        }
+
+        if (!data.password) {
+            setFieldErrors((prev) => ({ ...prev, password: 'Password is required.' }));
+            return;
+        }
+
+        post(route('login'), {
+            onSuccess: (page) => {
+                if (page.props.auth.user === null) {
+                    setLoginError('Invalid email or password.');
+                } else {
+                    setLoginError(''); // Clear the error if successful
+                }
+            }
+        });
     };
 
     return (
@@ -43,6 +75,7 @@ export default function Login({ status, canResetPassword }) {
             <Head title="Log in" />
 
             {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>}
+            {loginError && <div className="mb-4 font-medium text-sm text-red-600">{loginError}</div>}
 
             <form onSubmit={submit}>
                 <div className="text-center mt-8">
@@ -63,7 +96,7 @@ export default function Login({ status, canResetPassword }) {
                         onChange={(e) => setData('email', e.target.value)}
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={fieldErrors.email || errors.email} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -79,7 +112,7 @@ export default function Login({ status, canResetPassword }) {
                         onChange={(e) => setData('password', e.target.value)}
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError message={fieldErrors.password || errors.password} className="mt-2" />
                 </div>
 
                 <div className="block mt-4">
@@ -107,7 +140,6 @@ export default function Login({ status, canResetPassword }) {
                         Log in
                     </PrimaryButton>
                 </div>
-                
             </form>
         </GuestLayout>
         </>
